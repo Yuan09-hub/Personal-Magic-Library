@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Arcane Study - Study Notes</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 主题札记页面布局 */
+        .notes-container {
+            display: flex;
+            gap: 0;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 左侧标签栏 */
+        .notes-sidebar {
+            width: 250px;
+            background: #f8f6f2;
+            border-right: 1px solid #e0e0e0;
+            padding: 2rem 1rem;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+        
+        .sidebar-title {
+            font-size: 1rem;
+            color: #a0937d;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .note-tags {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .note-tag {
+            background: rgba(250, 249, 247, 0.95);
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid #e0d8cc;
+            border: 1px solid #e0d8cc;
+        }
+        
+        .note-tag:hover {
+            background: #f8f4ed;
+            transform: translateX(5px);
+            border-color: #d4b896;
+        }
+        
+        .note-tag.active {
+            border-left-color: #c19a6b;
+            background: #f8f4ed;
+            border-color: #d4b896;
+        }
+        
+        .note-tag-title {
+            font-weight: bold;
+            color: #6b4f3a;
+            margin-bottom: 0.3rem;
+        }
+        
+        .note-tag-preview {
+            font-size: 0.8rem;
+            color: #9a8e7f;
+            line-height: 1.4;
+        }
+        
+        /* 主内容区 */
+        .notes-content {
+            flex: 1;
+            padding: 2rem;
+        }
+        
+        /* 主题札记专用样式 */
+        .notes-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f8f6f2;
+            font-family: 'Georgia', serif;
+        }
+        
+        /* 区域标题通用样式 */
+        .section-title {
+            font-size: 1.8rem;
+            color: #6b4f3a;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(250, 249, 247, 0.95);
+            border: 2px solid #d4b896;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(212, 184, 150, 0.5), 0 0 30px rgba(212, 184, 150, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .section-title:hover {
+            box-shadow: 0 0 20px rgba(212, 184, 150, 0.7), 0 0 40px rgba(212, 184, 150, 0.3);
+            transform: translateY(-2px);
+            border-color: #c19a6b;
+        }
+        
+
+        
+        /* 主题区域 */
+        .note-topic {
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e8e2d9;
+        }
+        
+        .note-topic input {
+            width: 100%;
+            font-size: 2rem;
+            font-weight: normal;
+            text-align: center;
+            border: none;
+            background: rgba(250, 249, 247, 0.95);
+            color: #4a4a4a;
+            font-family: 'Georgia', serif;
+            outline: none;
+            padding: 1.5rem;
+            resize: none;
+            border-radius: 8px;
+            border: 1px solid #e0d8cc;
+            transition: all 0.3s ease;
+        }
+        
+        .note-topic input:focus {
+            background: #f8f4ed;
+            border-color: #d4b896;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 184, 150, 0.3);
+        }
+        
+        /* 侧边栏标题样式 */
+        .sidebar-title {
+            font-size: 1.2rem;
+            color: #6b4f3a;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* 判断列表 */
+        .judgments-section {
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e8e2d9;
+        }
+        
+        .judgments-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            margin-bottom: 2rem;
+        }
+        
+        .judgment-item {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            background: rgba(250, 249, 247, 0.95);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #d4b896;
+            border: 1px solid #e0d8cc;
+            transition: all 0.3s ease;
+        }
+        
+        .judgment-item:hover {
+            background: #f8f4ed;
+            transform: translateX(5px);
+            border-color: #d4b896;
+        }
+        
+        .judgment-number {
+            font-size: 1.2rem;
+            color: #6b4f3a;
+            margin-right: 1rem;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 0.2rem;
+        }
+        
+        .judgment-content {
+            flex: 1;
+        }
+        
+        .judgment-content input {
+            width: 100%;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            border: none;
+            background: transparent;
+            color: #4a4a4a;
+            font-family: 'Georgia', serif;
+            outline: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            resize: none;
+        }
+        
+        .judgment-content input:focus {
+            background: rgba(212, 184, 150, 0.1);
+        }
+        
+        .remove-judgment {
+            background: none;
+            border: none;
+            color: #b8b0a4;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-left: 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .remove-judgment:hover {
+            color: #9a8e7f;
+            background: rgba(212, 184, 150, 0.1);
+        }
+        
+        /* 添加判断按钮 */
+        .add-judgment {
+            width: 100%;
+            background: rgba(250, 249, 247, 0.95);
+            border: 2px dashed #d4b896;
+            color: #6b4f3a;
+            padding: 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .add-judgment:hover {
+            background: #f8f4ed;
+            border-color: #c19a6b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 184, 150, 0.3);
+        }
+        
+        /* 来源区域 */
+        .sources-section {
+            margin-top: 2rem;
+        }
+        
+        .sources-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        .source-item {
+            background: rgba(250, 249, 247, 0.95);
+            padding: 0.8rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            color: #6b4f3a;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            border: 1px solid #e0d8cc;
+            transition: all 0.3s ease;
+        }
+        
+        .source-item:hover {
+            background: #f8f4ed;
+            border-color: #d4b896;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 184, 150, 0.3);
+        }
+        
+        .source-item input {
+            border: none;
+            background: transparent;
+            color: #6b4f3a;
+            font-size: 0.9rem;
+            font-family: 'Georgia', serif;
+            outline: none;
+            width: 150px;
+        }
+        
+        .source-item input:focus {
+            color: #5a4430;
+            background: rgba(212, 184, 150, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .remove-source {
+            background: none;
+            border: none;
+            color: #b8b0a4;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 0.3rem;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .remove-source:hover {
+            color: #9a8e7f;
+            background: rgba(212, 184, 150, 0.1);
+        }
+        
+        .add-source {
+            background: rgba(250, 249, 247, 0.95);
+            border: 2px dashed #d4b896;
+            color: #6b4f3a;
+            padding: 0.8rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .add-source:hover {
+            background: #f8f4ed;
+            border-color: #c19a6b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 184, 150, 0.3);
+        }
+        
+        /* 保存按钮 */
+        .btn-primary {
+            background: #d4b896;
+            color: #5a4430;
+            border: 2px solid #c19a6b;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+        
+        .btn-primary:hover {
+            background: #c19a6b;
+            color: #4a3724;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(212, 184, 150, 0.5);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .notes-container {
+                padding: 1rem;
+            }
+            
+            .note-topic input {
+                font-size: 1.5rem;
+            }
+            
+            .judgment-content input {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">个人魔法书房</a>
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">我的藏书</a></li>
+                <li><a href="atlas.html">书籍地图</a></li>
+                <li><a href="notes.html">主题札记</a></li>
+                <li><a href="reading_challenge.html">阅读挑战</a></li>
+                <li><a href="moments.html">瞬间记录</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="container">
+        <!-- 主题札记页面布局 -->
+        <div class="notes-container">
+            <!-- 左侧标签栏 -->
+            <div class="notes-sidebar">
+                <div class="sidebar-title">我的主题</div>
+            <div class="note-tags" id="noteTags"></div>
+            </div>
+            
+            <!-- 右侧编辑区 -->
+            <div class="notes-content">
+                <!-- 主题区域 -->
+                <div class="note-topic">
+                    <div class="section-title">主题</div>
+                    <input type="text" placeholder="输入主题" id="topicInput">
+                </div>
+                
+                <!-- 当前判断区域 -->
+                <div class="judgments-section">
+                    <div class="section-title">观点</div>
+                    <ul class="judgments-list" id="judgmentsList">
+                        <li class="judgment-item">
+                            <span class="judgment-number">1</span>
+                            <div class="judgment-content">
+                                <input type="text" placeholder="输入观点">
+                            </div>
+                            <button class="remove-judgment" onclick="removeJudgment(this)">×</button>
+                        </li>
+                        <li class="judgment-item">
+                            <span class="judgment-number">2</span>
+                            <div class="judgment-content">
+                                <input type="text" placeholder="输入观点">
+                            </div>
+                            <button class="remove-judgment" onclick="removeJudgment(this)">×</button>
+                        </li>
+                        <li class="judgment-item">
+                            <span class="judgment-number">3</span>
+                            <div class="judgment-content">
+                                <input type="text" placeholder="输入观点">
+                            </div>
+                            <button class="remove-judgment" onclick="removeJudgment(this)">×</button>
+                        </li>
+                    </ul>
+                    <button class="add-judgment" onclick="addJudgment()">+ 添加观点</button>
+                </div>
+                
+                <!-- 来自区域 -->
+                <div class="sources-section">
+                    <div class="section-title">观点来源</div>
+                    <div class="sources-list" id="sourcesList">
+                        <div class="source-item">
+                            <input type="text" placeholder="书名">
+                            <button class="remove-source" onclick="removeSource(this)">×</button>
+                        </div>
+                        <div class="source-item">
+                            <input type="text" placeholder="书名">
+                            <button class="remove-source" onclick="removeSource(this)">×</button>
+                        </div>
+                        <button class="add-source" onclick="addSource()">+ 添加书籍</button>
+                    </div>
+                </div>
+                
+                <!-- 保存按钮 -->
+                <div style="margin-top: 3rem; text-align: center;">
+                    <button id="saveNote" class="btn btn-primary">保存笔记</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <p>&copy; 2025 The Arcane Study. 保留所有权利.</p>
+    </footer>
+
+    <script>
+        // 移动端菜单切换
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('active');
+        }
+        
+        // 全局变量
+        let notes = JSON.parse(localStorage.getItem('studyNotes')) || [];
+        let currentNoteId = null;
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotes();
+            
+            // 添加保存按钮事件监听
+            const saveBtn = document.getElementById('saveNote');
+            saveBtn.addEventListener('click', saveNote);
+        });
+        
+        // 添加观点
+        function addJudgment() {
+            const judgmentsList = document.getElementById('judgmentsList');
+            const judgmentCount = judgmentsList.children.length;
+            
+            const newJudgment = document.createElement('li');
+            newJudgment.className = 'judgment-item';
+            newJudgment.innerHTML = `
+                <span class="judgment-number">${judgmentCount + 1}</span>
+                <div class="judgment-content">
+                    <input type="text" placeholder="输入观点">
+                </div>
+                <button class="remove-judgment" onclick="removeJudgment(this)">×</button>
+            `;
+            
+            judgmentsList.appendChild(newJudgment);
+        }
+        
+        // 移除观点
+        function removeJudgment(button) {
+            const judgmentItem = button.closest('.judgment-item');
+            const judgmentsList = document.getElementById('judgmentsList');
+            
+            judgmentItem.remove();
+            
+            // 重新编号
+            const judgmentItems = judgmentsList.querySelectorAll('.judgment-item');
+            judgmentItems.forEach((item, index) => {
+                item.querySelector('.judgment-number').textContent = index + 1;
+            });
+        }
+        
+        // 添加书籍
+        function addSource() {
+            const sourcesList = document.getElementById('sourcesList');
+            const addButton = sourcesList.querySelector('.add-source');
+            
+            const newSource = document.createElement('div');
+            newSource.className = 'source-item';
+            newSource.innerHTML = `
+                <input type="text" placeholder="书名">
+                <button class="remove-source" onclick="removeSource(this)">×</button>
+            `;
+            
+            sourcesList.insertBefore(newSource, addButton);
+        }
+        
+        // 移除书籍
+        function removeSource(button) {
+            const sourceItem = button.closest('.source-item');
+            sourceItem.remove();
+        }
+        
+        // 保存笔记
+        function saveNote() {
+            const topic = document.getElementById('topicInput').value.trim();
+            if (!topic) {
+                alert('请输入主题');
+                return;
+            }
+            
+            // 获取观点
+            const judgments = [];
+            const judgmentInputs = document.querySelectorAll('.judgment-content input');
+            judgmentInputs.forEach(input => {
+                const value = input.value.trim();
+                if (value) {
+                    judgments.push(value);
+                }
+            });
+            
+            // 获取来源
+            const sources = [];
+            const sourceInputs = document.querySelectorAll('.source-item input');
+            sourceInputs.forEach(input => {
+                const value = input.value.trim();
+                if (value) {
+                    sources.push(value);
+                }
+            });
+            
+            // 创建笔记对象
+            const note = {
+                id: currentNoteId || Date.now().toString(),
+                topic: topic,
+                judgments: judgments,
+                sources: sources,
+                createdAt: currentNoteId ? notes.find(n => n.id === currentNoteId).createdAt : new Date().toISOString()
+            };
+            
+            // 保存到数组
+            if (currentNoteId) {
+                // 更新现有笔记
+                const noteIndex = notes.findIndex(n => n.id === currentNoteId);
+                notes[noteIndex] = note;
+            } else {
+                // 添加新笔记
+                notes.unshift(note);
+            }
+            
+            // 保存到本地存储
+            localStorage.setItem('studyNotes', JSON.stringify(notes));
+            
+            // 重新加载笔记列表
+            loadNotes();
+            
+            // 清空表单
+            clearForm();
+            
+            // 显示成功消息
+            alert('笔记保存成功');
+        }
+        
+        // 加载笔记列表
+        function loadNotes() {
+            const noteTagsContainer = document.getElementById('noteTags');
+            noteTagsContainer.innerHTML = '';
+            
+            if (notes.length === 0) {
+                noteTagsContainer.innerHTML = '<div style="color: #909090; font-style: italic;">暂无主题</div>';
+                return;
+            }
+            
+            notes.forEach(note => {
+                const noteTag = document.createElement('div');
+                noteTag.className = `note-tag ${currentNoteId === note.id ? 'active' : ''}`;
+                noteTag.dataset.id = note.id;
+                
+                // 创建标签内容
+                let preview = '';
+                if (note.judgments.length > 0) {
+                    preview = note.judgments[0];
+                    if (preview.length > 30) {
+                        preview = preview.substring(0, 30) + '...';
+                    }
+                }
+                
+                noteTag.innerHTML = `
+                    <div class="note-tag-title">${note.topic}</div>
+                    <div class="note-tag-preview">${preview}</div>
+                `;
+                
+                // 添加点击事件
+                noteTag.addEventListener('click', () => loadNote(note.id));
+                
+                noteTagsContainer.appendChild(noteTag);
+            });
+        }
+        
+        // 加载笔记内容
+        function loadNote(noteId) {
+            const note = notes.find(n => n.id === noteId);
+            if (!note) return;
+            
+            // 设置当前笔记ID
+            currentNoteId = noteId;
+            
+            // 更新标签激活状态
+            document.querySelectorAll('.note-tag').forEach(tag => {
+                tag.classList.remove('active');
+            });
+            document.querySelector(`[data-id="${noteId}"]`).classList.add('active');
+            
+            // 填充表单
+            document.getElementById('topicInput').value = note.topic;
+            
+            // 清空现有观点
+            const judgmentsList = document.getElementById('judgmentsList');
+            judgmentsList.innerHTML = '';
+            
+            // 添加观点
+            for (let i = 0; i < Math.max(note.judgments.length, 1); i++) {
+                const newJudgment = document.createElement('li');
+                newJudgment.className = 'judgment-item';
+                newJudgment.innerHTML = `
+                    <span class="judgment-number">${i + 1}</span>
+                    <div class="judgment-content">
+                        <input type="text" placeholder="输入观点" value="${note.judgments[i] || ''}">
+                    </div>
+                    <button class="remove-judgment" onclick="removeJudgment(this)">×</button>
+                `;
+                judgmentsList.appendChild(newJudgment);
+            }
+            
+            // 清空现有来源
+            const sourcesList = document.getElementById('sourcesList');
+            const addButton = sourcesList.querySelector('.add-source');
+            
+            // 移除所有来源项（除了添加按钮）
+            const sourceItems = sourcesList.querySelectorAll('.source-item');
+            sourceItems.forEach(item => item.remove());
+            
+            // 添加来源
+            note.sources.forEach(source => {
+                const newSource = document.createElement('div');
+                newSource.className = 'source-item';
+                newSource.innerHTML = `
+                    <input type="text" placeholder="书名" value="${source}">
+                    <button class="remove-source" onclick="removeSource(this)">×</button>
+                `;
+                sourcesList.insertBefore(newSource, addButton);
+            });
+        }
+        
+        // 清空表单
+        function clearForm() {
+            document.getElementById('topicInput').value = '';
+            
+            // 重置观点列表
+            const judgmentsList = document.getElementById('judgmentsList');
+            judgmentsList.innerHTML = `
+                <li class="judgment-item">
+                    <span class="judgment-number">1</span>
+                    <div class="judgment-content">
+                        <input type="text" placeholder="输入观点">
+                    </div>
+                    <button class="remove-judgment" onclick="removeJudgment(this)">×</button>
+                </li>
+                <li class="judgment-item">
+                    <span class="judgment-number">2</span>
+                    <div class="judgment-content">
+                        <input type="text" placeholder="输入观点">
+                    </div>
+                    <button class="remove-judgment" onclick="removeJudgment(this)">×</button>
+                </li>
+                <li class="judgment-item">
+                    <span class="judgment-number">3</span>
+                    <div class="judgment-content">
+                        <input type="text" placeholder="输入观点">
+                    </div>
+                    <button class="remove-judgment" onclick="removeJudgment(this)">×</button>
+                </li>
+            `;
+            
+            // 重置来源列表
+            const sourcesList = document.getElementById('sourcesList');
+            const addButton = sourcesList.querySelector('.add-source');
+            
+            // 移除所有来源项（除了添加按钮）
+            const sourceItems = sourcesList.querySelectorAll('.source-item');
+            sourceItems.forEach(item => item.remove());
+            
+            // 添加默认来源项
+            for (let i = 0; i < 2; i++) {
+                const newSource = document.createElement('div');
+                newSource.className = 'source-item';
+                newSource.innerHTML = `
+                    <input type="text" placeholder="书名">
+                    <button class="remove-source" onclick="removeSource(this)">×</button>
+                `;
+                sourcesList.insertBefore(newSource, addButton);
+            }
+            
+            // 重置当前笔记ID
+            currentNoteId = null;
+            
+            // 更新标签激活状态
+            document.querySelectorAll('.note-tag').forEach(tag => {
+                tag.classList.remove('active');
+            });
+        }
+    </script>
+</body>
+</html>

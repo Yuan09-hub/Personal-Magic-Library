@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>The Arcane Study - Atlas of Books</title>
+        <link rel="stylesheet" href="style.css">
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://d3js.org/topojson.v3.min.js"></script>
+        <script>
+        // 移动端菜单切换
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('active');
+        }
+        
+        // 国家到地理坐标的映射（真实经纬度）
+        const countryCoordinates = {
+            // 亚洲
+            '中国': { lon: 104.1954, lat: 35.8617, continent: 'asia' },
+            '日本': { lon: 138.2529, lat: 36.2048, continent: 'asia' },
+            '韩国': { lon: 127.7669, lat: 35.9078, continent: 'asia' },
+            '印度': { lon: 78.9629, lat: 20.5937, continent: 'asia' },
+            '伊朗': { lon: 53.6880, lat: 32.4279, continent: 'asia' },
+            '沙特阿拉伯': { lon: 45.0792, lat: 23.8859, continent: 'asia' },
+            '以色列': { lon: 34.8516, lat: 31.0461, continent: 'asia' },
+            '新加坡': { lon: 103.8198, lat: 1.3521, continent: 'asia' },
+            '马来西亚': { lon: 101.9758, lat: 4.2105, continent: 'asia' },
+            '泰国': { lon: 100.9925, lat: 15.8700, continent: 'asia' },
+            
+            // 欧洲
+            '英国': { lon: -3.4359, lat: 55.3781, continent: 'europe' },
+            '法国': { lon: 2.2137, lat: 46.2276, continent: 'europe' },
+            '德国': { lon: 10.4515, lat: 51.1657, continent: 'europe' },
+            '意大利': { lon: 12.5674, lat: 41.8719, continent: 'europe' },
+            '西班牙': { lon: -3.7492, lat: 40.4637, continent: 'europe' },
+            '葡萄牙': { lon: -8.2244, lat: 39.3999, continent: 'europe' },
+            '俄罗斯': { lon: 37.6173, lat: 55.7558, continent: 'europe' },
+            '乌克兰': { lon: 31.1656, lat: 48.3794, continent: 'europe' },
+            '波兰': { lon: 19.1451, lat: 51.9194, continent: 'europe' },
+            '荷兰': { lon: 5.2913, lat: 52.1326, continent: 'europe' },
+            '比利时': { lon: 4.4699, lat: 50.5039, continent: 'europe' },
+            '瑞士': { lon: 8.2275, lat: 46.8182, continent: 'europe' },
+            '瑞典': { lon: 18.6435, lat: 60.1282, continent: 'europe' },
+            '挪威': { lon: 8.4689, lat: 60.4720, continent: 'europe' },
+            '丹麦': { lon: 9.5018, lat: 56.2639, continent: 'europe' },
+            '芬兰': { lon: 25.7482, lat: 61.9241, continent: 'europe' },
+            '爱尔兰': { lon: -8.2439, lat: 53.4129, continent: 'europe' },
+            '冰岛': { lon: -21.8952, lat: 64.9631, continent: 'europe' },
+            '希腊': { lon: 23.7275, lat: 39.0742, continent: 'europe' },
+            '奥地利': { lon: 14.5501, lat: 47.5162, continent: 'europe' },
+            '捷克': { lon: 15.4730, lat: 49.8175, continent: 'europe' },
+            '匈牙利': { lon: 19.3901, lat: 47.1625, continent: 'europe' },
+            '罗马尼亚': { lon: 24.9668, lat: 45.9432, continent: 'europe' },
+            
+            // 北美洲
+            '美国': { lon: -95.7129, lat: 37.0902, continent: 'north_america' },
+            '加拿大': { lon: -106.3468, lat: 56.1304, continent: 'north_america' },
+            '墨西哥': { lon: -102.5528, lat: 23.6345, continent: 'north_america' },
+            
+            // 南美洲
+            '巴西': { lon: -51.9253, lat: -14.2350, continent: 'south_america' },
+            '阿根廷': { lon: -63.6167, lat: -38.4161, continent: 'south_america' },
+            '智利': { lon: -71.5430, lat: -35.6751, continent: 'south_america' },
+            '哥伦比亚': { lon: -74.2973, lat: 4.5709, continent: 'south_america' },
+            '秘鲁': { lon: -75.0152, lat: -9.1900, continent: 'south_america' },
+            '委内瑞拉': { lon: -66.5897, lat: 8.0000, continent: 'south_america' },
+            
+            // 非洲
+            '埃及': { lon: 30.8025, lat: 26.8206, continent: 'africa' },
+            '南非': { lon: 22.9375, lat: -30.5595, continent: 'africa' },
+            '尼日利亚': { lon: 7.9465, lat: 9.0820, continent: 'africa' },
+            '肯尼亚': { lon: 37.9062, lat: 0.0236, continent: 'africa' },
+            '摩洛哥': { lon: -7.0926, lat: 31.7917, continent: 'africa' },
+            '阿尔及利亚': { lon: 1.6596, lat: 28.0339, continent: 'africa' },
+            '埃塞俄比亚': { lon: 40.4897, lat: 9.1450, continent: 'africa' },
+            
+            // 大洋洲
+            '澳大利亚': { lon: 133.7751, lat: -25.2744, continent: 'australia' },
+            '新西兰': { lon: 174.8860, lat: -40.9006, continent: 'australia' },
+            
+            // 默认国家
+            '其他': { lon: 0, lat: 0, continent: 'other' }
+        };
+        
+        // 获取所有书籍
+        function getAllBooks() {
+            return JSON.parse(localStorage.getItem('books')) || [];
+        }
+        
+        // 按国家分组书籍
+        function groupBooksByCountry() {
+            const books = getAllBooks();
+            const grouped = {};
+            
+            books.forEach(book => {
+                const country = book.authorCountry || '其他';
+                if (!grouped[country]) {
+                    grouped[country] = [];
+                }
+                grouped[country].push(book);
+            });
+            
+            return grouped;
+        }
+        
+        // 全局变量
+        let projection, path, svg;
+        
+        // 初始化地图
+        function initMap() {
+            const mapElement = document.getElementById('worldMap');
+            const width = mapElement.clientWidth;
+            const height = mapElement.clientHeight;
+            
+            // 创建SVG元素
+            svg = d3.select(mapElement)
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('class', 'continent-outline');
+            
+            // 创建地图投影（使用Natural Earth投影）
+            projection = d3.geoNaturalEarth1()
+                .scale(width / 6.5)
+                .translate([width / 2, height / 2]);
+            
+            // 创建路径生成器
+            path = d3.geoPath().projection(projection);
+            
+            // 加载世界地图数据
+            d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+                .then(data => {
+                    // 将TopoJSON转换为GeoJSON
+                    const countries = topojson.feature(data, data.objects.countries);
+                    
+                    // 绘制国家边界
+                    svg.selectAll('.country')
+                        .data(countries.features)
+                        .enter()
+                        .append('path')
+                        .attr('class', 'country')
+                        .attr('d', path)
+                        .style('fill', 'rgba(244, 228, 188, 0.3)')
+                        .style('stroke', 'rgba(139, 69, 19, 0.5)')
+                        .style('stroke-width', 0.5);
+                    
+                    // 绘制大洲边界
+                    svg.append('path')
+                        .datum(topojson.mesh(data, data.objects.countries, (a, b) => a !== b))
+                        .attr('class', 'continent-boundary')
+                        .attr('d', path)
+                        .style('fill', 'none')
+                        .style('stroke', 'rgba(139, 69, 19, 0.7)')
+                        .style('stroke-width', 1);
+                    
+                    // 初始化完成后渲染书籍
+                    renderBookMap();
+                })
+                .catch(error => {
+                    console.error('Error loading world map data:', error);
+                    // 加载失败时显示提示
+                    const emptyMap = document.getElementById('emptyMap');
+                    emptyMap.innerHTML = `
+                        <h3>📚 地图加载失败</h3>
+                        <p>无法加载世界地图数据，请检查网络连接后重试</p>
+                    `;
+                    emptyMap.style.display = 'block';
+                });
+        }
+        
+        // 渲染书籍地图
+        function renderBookMap() {
+            const groupedBooks = groupBooksByCountry();
+            const mapContainer = document.getElementById('bookMap');
+            
+            mapContainer.innerHTML = '';
+            
+            // 检查是否有书籍
+            const hasBooks = Object.keys(groupedBooks).some(country => groupedBooks[country].length > 0);
+            if (!hasBooks) {
+                const emptyMap = document.getElementById('emptyMap');
+                emptyMap.style.display = 'block';
+                return;
+            }
+            
+            // 隐藏空状态
+            const emptyMap = document.getElementById('emptyMap');
+            emptyMap.style.display = 'none';
+            
+            // 渲染每个国家的书籍
+            for (const country in groupedBooks) {
+                const books = groupedBooks[country];
+                if (books.length === 0) continue;
+                
+                // 获取国家经纬度
+                const coords = countryCoordinates[country] || countryCoordinates['其他'];
+                
+                // 使用D3投影转换为屏幕坐标
+                const [x, y] = projection([coords.lon, coords.lat]);
+                
+                // 创建国家书籍容器
+                const countryContainer = document.createElement('div');
+                countryContainer.className = 'country-books';
+                countryContainer.style.left = `${x}px`;
+                countryContainer.style.top = `${y}px`;
+                countryContainer.dataset.country = country;
+                countryContainer.dataset.continent = coords.continent;
+                
+                // 添加国家标签
+                const countryLabel = document.createElement('div');
+                countryLabel.className = 'country-label';
+                countryLabel.textContent = country;
+                countryContainer.appendChild(countryLabel);
+                
+                // 创建书籍网格
+                const booksGrid = document.createElement('div');
+                booksGrid.className = 'books-grid';
+                
+                // 渲染书籍
+                books.forEach((book, index) => {
+                    const bookElement = document.createElement('div');
+                    bookElement.className = 'book-card';
+                    bookElement.style.animationDelay = `${index * 0.1}s`;
+                    
+                    // 计算偏移量（轻微错开效果）
+                    const offsetX = (index % 3) * 2;
+                    const offsetY = Math.floor(index / 3) * 2;
+                    bookElement.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+                    
+                    // 书籍封面
+                    bookElement.innerHTML = `
+                        <div class="book-cover" style="${book.coverUrl ? `background-image: url('${book.coverUrl}')` : 'background: linear-gradient(135deg, #8b4513 0%, #d4a76a 100%);'}">
+                            ${!book.coverUrl ? `<div class="book-title-placeholder">${book.title.charAt(0)}</div>` : ''}
+                        </div>
+                        <div class="book-tooltip">
+                            <h4>${book.title}</h4>
+                            <p>${book.author}</p>
+                            <p>${book.authorCountry}</p>
+                        </div>
+                    `;
+                    
+                    // 添加点击事件，显示书籍详细信息
+                    bookElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        showBookDetails(book.id);
+                    });
+                    
+                    booksGrid.appendChild(bookElement);
+                });
+                
+                countryContainer.appendChild(booksGrid);
+                mapContainer.appendChild(countryContainer);
+            }
+        }
+        
+        // 实现缩放功能
+        function setupZoom() {
+            const map = document.getElementById('worldMap');
+            let scale = 1;
+            const zoomSpeed = 0.1;
+            
+            // 鼠标滚轮缩放
+            map.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                
+                const delta = e.deltaY > 0 ? -zoomSpeed : zoomSpeed;
+                scale = Math.max(0.5, Math.min(3, scale + delta));
+                
+                map.style.transform = `scale(${scale})`;
+            });
+            
+            // 重置缩放
+            const resetBtn = document.getElementById('resetZoom');
+            resetBtn.addEventListener('click', () => {
+                scale = 1;
+                map.style.transform = `scale(1)`;
+            });
+        }
+        
+        // 显示书籍详细信息
+        function showBookDetails(bookId) {
+            const books = getAllBooks();
+            const book = books.find(b => b.id === bookId);
+            if (!book) return;
+            
+            // 创建书籍详情弹窗
+            let popup = document.getElementById('bookDetailsPopup');
+            if (!popup) {
+                popup = document.createElement('div');
+                popup.id = 'bookDetailsPopup';
+                popup.className = 'book-details-popup';
+                document.body.appendChild(popup);
+            }
+            
+            // 构建书籍详情HTML，展示所有信息
+            popup.innerHTML = `
+                <div class="book-details-content">
+                    <div class="popup-header">
+                        <h3>${book.title}</h3>
+                        <button class="close-btn" id="closePopupBtn">&times;</button>
+                    </div>
+                    <div class="book-details-body">
+                        ${book.coverUrl ? `<div class="book-cover-large" style="background-image: url('${book.coverUrl}'); background-size: cover; background-position: center;"></div>` : ''}
+                        <div class="book-info">
+                            <p><strong>书名：</strong>${book.title}</p>
+                            <p><strong>作者：</strong>${book.author}</p>
+                            <p><strong>作者国籍：</strong>${book.authorCountry}</p>
+                            ${book.originalTitle ? `<p><strong>原书名：</strong>${book.originalTitle}</p>` : '<p><strong>原书名：</strong>无</p>'}
+                            ${book.translator ? `<p><strong>译者：</strong>${book.translator}</p>` : '<p><strong>译者：</strong>无</p>'}
+                            <p><strong>分类：</strong>${getCategoryName(book.category)}</p>
+                            <p><strong>添加时间：</strong>${new Date(book.addedAt).toLocaleString('zh-CN')}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 显示弹窗
+            popup.classList.add('active');
+            
+            // 防止背景滚动
+            document.body.classList.add('popup-open');
+            
+            // 添加关闭按钮事件监听器
+            const closeBtn = document.getElementById('closePopupBtn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeBookDetails);
+            }
+            
+            // 添加点击外部关闭功能
+            popup.onclick = function(e) {
+                if (e.target === popup) {
+                    closeBookDetails();
+                }
+            };
+        }
+        
+        // 关闭书籍详情弹窗
+        function closeBookDetails() {
+            const popup = document.getElementById('bookDetailsPopup');
+            if (popup) {
+                popup.classList.remove('active');
+            }
+            
+            // 允许背景滚动
+            document.body.classList.remove('popup-open');
+        }
+        
+        // 获取分类名称
+        function getCategoryName(categoryValue) {
+            const categoryNames = {
+                'literature': '文学',
+                'history': '历史',
+                'philosophy': '哲学',
+                'science': '科学',
+                'art': '艺术',
+                'other': '其他'
+            };
+            return categoryNames[categoryValue] || categoryValue;
+        }
+        
+        // 实现拖拽功能
+        function setupDrag() {
+            const map = document.getElementById('worldMap');
+            let isDragging = false;
+            let startX, startY;
+            let translateX = 0, translateY = 0;
+            
+            map.addEventListener('mousedown', (e) => {
+                // 只有点击地图背景或大洲轮廓时才允许拖拽
+                if (e.target === map || e.target.tagName === 'path' || e.target.classList.contains('continent-outline')) {
+                    isDragging = true;
+                    startX = e.clientX - translateX;
+                    startY = e.clientY - translateY;
+                    map.style.cursor = 'grabbing';
+                }
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                translateX = e.clientX - startX;
+                translateY = e.clientY - startY;
+                
+                map.style.transform = `translate(${translateX}px, ${translateY}px) scale(${map.style.transform.match(/scale\(([0-9.]+)\)/)?.[1] || 1})`;
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                map.style.cursor = 'grab';
+            });
+        }
+        
+        // 页面加载时初始化
+        window.onload = function() {
+            initMap();
+            setupZoom();
+            setupDrag();
+            
+            // 监听窗口大小变化，重新调整地图
+            window.addEventListener('resize', () => {
+                // 清除现有SVG
+                d3.select('.continent-outline').remove();
+                // 重新初始化地图
+                initMap();
+            });
+        };
+    </script>
+    <style>
+        /* 书籍地图专用样式 */
+        .atlas-container {
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        /* 世界地图容器 */
+        .world-map {
+            width: 100%;
+            height: 90vh;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9);
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            border: 5px solid #8b4513;
+            cursor: grab;
+            transition: transform 0.2s ease;
+            transform-origin: center;
+        }
+        
+        .world-map:active {
+            cursor: grabbing;
+        }
+        
+        /* 大洲轮廓 */
+        .continent-outline {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .continent-outline path {
+            fill: rgba(244, 228, 188, 0.3);
+            stroke: rgba(139, 69, 19, 0.5);
+            stroke-width: 2;
+            transition: fill 0.3s ease;
+        }
+        
+        /* 书籍地图容器 */
+        #bookMap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        /* 国家书籍容器 */
+        .country-books {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            pointer-events: auto;
+            z-index: 3;
+        }
+        
+        /* 国家标签 */
+        .country-label {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(26, 18, 10, 0.7);
+            color: #f4e4bc;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            white-space: nowrap;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            z-index: 4;
+        }
+        
+        /* 书籍网格 */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
+            gap: 4px;
+            max-width: 100px;
+            background: rgba(244, 228, 188, 0.5);
+            padding: 6px;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(139, 69, 19, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .country-books:hover .books-grid {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 书籍卡片 */
+        .book-card {
+            position: relative;
+            width: 20px;
+            height: 28px;
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+            transform: translateY(15px);
+            cursor: pointer;
+        }
+        
+        .book-card:hover {
+            transform: translate(0, 0) scale(1.3) !important;
+            z-index: 100 !important;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8) !important;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 书籍封面 */
+        .book-cover {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid #d4a76a;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        /* 书籍标题占位符 */
+        .book-title-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #f4e4bc;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+            background: rgba(139, 69, 19, 0.8);
+        }
+        
+        /* 书籍详情弹窗样式 - 使用与style.css一致的样式 */
+        .book-details-popup {
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .book-details-popup.active {
+            display: flex;
+        }
+        
+        /* 防止背景滚动 */
+        body.popup-open {
+            overflow: hidden;
+        }
+        
+        /* 移除默认滚动条样式 */
+        .book-details-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .book-details-content::-webkit-scrollbar-track {
+            background: rgba(139, 69, 19, 0.1);
+        }
+        
+        .book-details-content::-webkit-scrollbar-thumb {
+            background: rgba(139, 69, 19, 0.4);
+            border-radius: 4px;
+        }
+        
+        .book-details-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 69, 19, 0.6);
+        }
+        
+        /* 书籍详情内容样式 - 使用与style.css一致的样式 */
+        .book-details-content {
+            background: #f4e4bc;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(139, 69, 19, 0.3);
+            max-width: 600px;
+            width: fit-content;
+            min-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: fadeIn 0.4s ease;
+            border: 1px solid rgba(139, 69, 19, 0.2);
+        }
+        
+        /* 书籍详情内容样式 */
+        .book-details-body {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .book-cover-large {
+            width: 220px;
+            height: auto;
+            aspect-ratio: 2/3;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            margin: 0 auto;
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+                0 0 30px rgba(212, 167, 106, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .book-cover-large::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .book-cover-large:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 12px 35px rgba(0, 0, 0, 0.4),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+                0 0 40px rgba(212, 167, 106, 0.3);
+        }
+        
+        .book-info {
+            width: 100%;
+            max-width: 450px;
+            color: #3a2f1e;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.1);
+            font-size: 1rem;
+            line-height: 1.7;
+            text-align: left;
+        }
+        
+        .book-info p {
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .book-info strong {
+            color: #8b4513;
+            font-weight: bold;
+            min-width: 80px;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* 书籍提示框 */
+        .book-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(26, 18, 10, 0.95);
+            color: #f4e4bc;
+            padding: 0.8rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+            border: 2px solid #d4a76a;
+            min-width: 200px;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            pointer-events: none;
+        }
+        
+        .book-card:hover .book-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-10px);
+        }
+        
+        .book-tooltip h4 {
+            color: #d4a76a;
+            margin: 0 0 0.3rem 0;
+            font-size: 1rem;
+        }
+        
+        .book-tooltip p {
+            margin: 0.2rem 0;
+            font-size: 0.8rem;
+        }
+        
+        /* 操作按钮 */
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .map-control-btn {
+            background: rgba(26, 18, 10, 0.9);
+            color: #d4a76a;
+            border: 2px solid #d4a76a;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+        }
+        
+        .map-control-btn:hover {
+            background: rgba(212, 167, 106, 0.9);
+            color: #3a2f1e;
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(212, 167, 106, 0.8);
+        }
+        
+        /* 空状态 */
+        .empty-map {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #8b4513;
+            z-index: 10;
+            background: rgba(244, 228, 188, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            border: 3px solid #d4a76a;
+        }
+        
+        .empty-map h3 {
+            color: #d4a76a;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-map p {
+            margin: 0.5rem 0;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .world-map {
+                height: 70vh;
+            }
+            
+            .book-card {
+                width: 18px;
+                height: 25px;
+            }
+            
+            .books-grid {
+                grid-template-columns: repeat(auto-fit, minmax(18px, 1fr));
+                gap: 4px;
+                padding: 5px;
+                max-width: 100px;
+            }
+            
+            .country-label {
+                font-size: 0.7rem;
+                padding: 0.15rem 0.5rem;
+            }
+        }
+        
+        /* 确保书籍卡片缩放不会超过大洲宽度的15% */
+        .book-card:hover {
+            transform: translate(0, 0) scale(1.2) !important;
+            z-index: 100 !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">个人魔法书房</a>
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">我的藏书</a></li>
+                <li><a href="atlas.html">书籍地图</a></li>
+                <li><a href="notes.html">主题札记</a></li>
+                <li><a href="reading_challenge.html">阅读挑战</a></li>
+                <li><a href="moments.html">瞬间记录</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="container">
+        <h1>Atlas of Books</h1>
+        <p>探索你的阅读足迹，发现全球作者的书籍分布</p>
+
+        <!-- 地图容器 -->
+        <div class="atlas-container">
+            <!-- 地图操作按钮 -->
+            <div class="map-controls">
+                <button id="resetZoom" class="map-control-btn" title="重置缩放">🔄</button>
+            </div>
+            
+            <div id="worldMap" class="world-map">
+                <!-- 书籍地图容器 -->
+                <div id="bookMap"></div>
+                
+                <!-- 空状态提示 -->
+                <div id="emptyMap" class="empty-map">
+                    <h3>📚 你的书架还没有书籍</h3>
+                    <p>去首页添加书籍，它们会自动出现在世界地图上</p>
+                    <a href="index.html" class="btn" style="margin-top: 1rem; display: inline-block;">添加书籍</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 地图说明 -->
+        <div class="card" style="margin-top: 2rem;">
+            <h3>如何使用</h3>
+            <ul style="list-style-type: disc; margin-left: 2rem; line-height: 1.8;">
+                <li><strong>查看书籍：</strong>将鼠标悬停在书籍封面上查看详细信息</li>
+                <li><strong>缩放地图：</strong>使用鼠标滚轮放大或缩小地图</li>
+                <li><strong>拖动地图：</strong>按住鼠标左键拖动地图</li>
+                <li><strong>重置视图：</strong>点击右上角的🔄按钮重置地图</li>
+                <li><strong>添加书籍：</strong>去首页添加书籍，它们会自动按作者国籍分类显示在地图上</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <p>&copy; 2025 The Arcane Study. 保留所有权利.</p>
+    </footer>
+
+    <!-- 滚动到顶部按钮 -->
+    <button class="scroll-top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})

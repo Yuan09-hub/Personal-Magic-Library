@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Arcane Study - Reading Challenge</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 阅读挑战页面头部背景图样式 */
+        .challenge-header {
+            background-image: url('images/Reading Desk.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            margin: -2rem -2rem 2rem -2rem;
+            padding: 2rem;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        
+        /* 添加深色半透明遮罩 */
+        .challenge-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* 深色半透明遮罩 */
+            z-index: 1;
+        }
+        
+        /* 确保头部内容在遮罩之上 */
+        .challenge-header > * {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">个人魔法书房</a>
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">我的藏书</a></li>
+                <li><a href="atlas.html">书籍地图</a></li>
+                <li><a href="notes.html">主题札记</a></li>
+                <li><a href="reading_challenge.html">阅读挑战</a></li>
+                <li><a href="moments.html">瞬间记录</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="container">
+        <!-- 挑战头部区域 - 带有背景图和遮罩 -->
+        <div class="challenge-header">
+            <!-- 顶部标题区 -->
+            <header style="text-align: center; margin-bottom: 2rem;">
+                <h1>阅读挑战</h1>
+                <p style="color: #d4a76a; font-style: italic;">选择你想参加的挑战</p>
+            </header>
+            
+            <!-- 筛选标签 -->
+            <div style="display: flex; justify-content: center; margin-bottom: 2rem; gap: 1rem;">
+                <div class="filter-tab active" data-filter="all" style="padding: 0.8rem 1.5rem; background: linear-gradient(135deg, #d4a76a 0%, #8b4513 100%); color: #3a2f1e; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; border: 2px solid #8b4513;">全部</div>
+                <div class="filter-tab" data-filter="in-progress" style="padding: 0.8rem 1.5rem; background: rgba(244, 228, 188, 0.9); color: #3a2f1e; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; border: 2px solid #8b4513;">进行中</div>
+                <div class="filter-tab" data-filter="completed" style="padding: 0.8rem 1.5rem; background: rgba(244, 228, 188, 0.9); color: #3a2f1e; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; border: 2px solid #8b4513;">已完成</div>
+                <div class="filter-tab" data-filter="available" style="padding: 0.8rem 1.5rem; background: rgba(244, 228, 188, 0.9); color: #3a2f1e; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; border: 2px solid #8b4513;">可参加</div>
+            </div>
+        </div>
+        
+        <!-- 模态框 - 参加挑战输入 -->
+        <div id="joinModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+            <div style="background-color: #f4e4bc; margin: 15% auto; padding: 2rem; border-radius: 8px; width: 80%; max-width: 500px; position: relative;">
+                <span id="closeModal" style="position: absolute; right: 1rem; top: 1rem; font-size: 1.5rem; cursor: pointer;">&times;</span>
+                <h3 id="modalTitle" style="margin-bottom: 1rem;"></h3>
+                <p id="modalDescription" style="margin-bottom: 1.5rem; color: #8b4513;"></p>
+                <div id="modalInputSection" style="margin-bottom: 1.5rem;">
+                    <label id="modalLabel" style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #8b4513;"></label>
+                    <input type="text" id="modalInput" style="width: 100%; padding: 0.8rem; border: 2px solid #d4a76a; border-radius: 8px; font-family: 'Georgia', serif; color: #3a2f1e;">
+                    <div id="modalError" style="color: #c1121f; font-size: 0.9rem; margin-top: 0.5rem;"></div>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button id="cancelJoin" style="padding: 0.8rem 1.5rem; background: rgba(244, 228, 188, 0.9); color: #3a2f1e; border: 2px solid #8b4513; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; font-family: 'Georgia', serif;">取消</button>
+                    <button id="confirmJoin" style="padding: 0.8rem 1.5rem; background: linear-gradient(135deg, #d4a76a 0%, #8b4513 100%); color: #3a2f1e; border: 2px solid #8b4513; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; font-family: 'Georgia', serif;">确认参加</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 挑战卡片列表 -->
+        <div class="challenge-grid" id="challengeGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;"></div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <p>&copy; 2025 The Arcane Study. 保留所有权利.</p>
+    </footer>
+
+    <script>
+        // 系统推荐挑战（常量，不存入localStorage）
+        const presetChallenges = [
+            {
+                id: 1,
+                title: "月度主题探索",
+                description: "每月探索一个特定主题",
+                difficulty: "中等",
+                duration: "30天",
+                bookCount: 3,
+                status: "available",
+                type: "theme"
+            },
+            {
+                id: 2,
+                title: "作者深度阅读",
+                description: "深入阅读一位作者的作品",
+                difficulty: "困难",
+                duration: "60天",
+                bookCount: 5,
+                status: "available",
+                type: "author"
+            },
+            {
+                id: 3,
+                title: "快速阅读挑战",
+                description: "周末读完一本书",
+                difficulty: "简单",
+                duration: "3天",
+                bookCount: 1,
+                status: "available",
+                type: "speed"
+            }
+        ];
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从localStorage获取用户挑战数据
+            let userChallenges = JSON.parse(localStorage.getItem('userChallenges')) || [];
+            
+            // 初始化用户挑战（如果为空）
+            if (!Array.isArray(userChallenges)) {
+                userChallenges = [];
+                localStorage.setItem('userChallenges', JSON.stringify(userChallenges));
+            }
+            
+            // 更新挑战状态（检查是否超时）
+            updateChallengeStatuses(userChallenges);
+            
+            // 渲染挑战列表
+            renderChallenges(presetChallenges, userChallenges);
+            
+            // 模态框元素
+            const joinModal = document.getElementById('joinModal');
+            const closeModal = document.getElementById('closeModal');
+            const cancelJoin = document.getElementById('cancelJoin');
+            const confirmJoin = document.getElementById('confirmJoin');
+            const modalInput = document.getElementById('modalInput');
+            const modalError = document.getElementById('modalError');
+            let currentChallenge = null;
+            
+            // 关闭模态框
+            function hideModal() {
+                joinModal.style.display = 'none';
+                modalInput.value = '';
+                modalError.textContent = '';
+                modalInput.style.borderColor = '#d4a76a';
+                currentChallenge = null;
+            }
+            
+            // 关闭模态框事件
+            closeModal.addEventListener('click', hideModal);
+            cancelJoin.addEventListener('click', hideModal);
+            
+            // 点击模态框外部关闭
+            window.addEventListener('click', function(event) {
+                if (event.target === joinModal) {
+                    hideModal();
+                }
+            });
+            
+            // 确认参加挑战
+            confirmJoin.addEventListener('click', function() {
+                const inputValue = modalInput.value.trim();
+                
+                // 验证输入
+                if (!inputValue) {
+                    modalError.textContent = '请输入必填信息！';
+                    modalInput.style.borderColor = '#c1121f';
+                    return;
+                }
+                
+                // 创建用户挑战对象
+                const startDate = new Date();
+                const deadline = new Date();
+                const durationDays = parseInt(currentChallenge.duration.replace(/[^0-9]/g, ''));
+                deadline.setDate(startDate.getDate() + durationDays);
+                
+                const newUserChallenge = {
+                    id: Date.now(), // 使用时间戳作为唯一ID
+                    challengeId: currentChallenge.id, // 保留预设挑战ID用于关联
+                    title: currentChallenge.title,
+                    description: currentChallenge.description,
+                    difficulty: currentChallenge.difficulty,
+                    duration: currentChallenge.duration,
+                    bookCount: currentChallenge.bookCount,
+                    type: currentChallenge.type,
+                    customValue: inputValue,
+                    status: 'active',
+                    books: [],
+                    createdAt: startDate.toISOString(),
+                    deadline: deadline.toISOString(),
+                    updatedAt: startDate.toISOString()
+                };
+                
+                // 添加到用户挑战列表
+                userChallenges.push(newUserChallenge);
+                
+                // 保存到localStorage
+                localStorage.setItem('userChallenges', JSON.stringify(userChallenges));
+                
+                // 隐藏模态框
+                hideModal();
+                
+                // 重新渲染挑战列表
+                renderChallenges(presetChallenges, userChallenges, document.querySelector('.filter-tab.active').dataset.filter);
+            });
+            
+            // 参加挑战
+            window.joinChallenge = function(challengeId) {
+                // 找到要参加的挑战
+                const challengeToJoin = presetChallenges.find(ch => ch.id === challengeId);
+                if (challengeToJoin) {
+                    currentChallenge = challengeToJoin;
+                    
+                    // 设置模态框内容
+                    document.getElementById('modalTitle').textContent = challengeToJoin.title;
+                    document.getElementById('modalDescription').textContent = challengeToJoin.description;
+                    
+                    // 根据挑战类型设置输入提示
+                    if (challengeToJoin.type === 'author') {
+                        document.getElementById('modalLabel').textContent = '请输入作者姓名';
+                        document.getElementById('modalInput').placeholder = '例如：加西亚·马尔克斯';
+                    } else if (challengeToJoin.type === 'theme') {
+                        document.getElementById('modalLabel').textContent = '请输入本次阅读主题';
+                        document.getElementById('modalInput').placeholder = '例如：女性文学、拉美文学';
+                    } else {
+                        // 快速阅读挑战不需要额外输入
+                        const startDate = new Date();
+                        const deadline = new Date();
+                        const durationDays = parseInt(challengeToJoin.duration.replace(/[^0-9]/g, ''));
+                        deadline.setDate(startDate.getDate() + durationDays);
+                        
+                        const newUserChallenge = {
+                            id: Date.now(), // 使用时间戳作为唯一ID
+                            challengeId: challengeToJoin.id, // 保留预设挑战ID用于关联
+                            title: challengeToJoin.title,
+                            description: challengeToJoin.description,
+                            difficulty: challengeToJoin.difficulty,
+                            duration: challengeToJoin.duration,
+                            bookCount: challengeToJoin.bookCount,
+                            type: challengeToJoin.type,
+                            status: 'active',
+                            books: [],
+                            createdAt: startDate.toISOString(),
+                            deadline: deadline.toISOString(),
+                            updatedAt: startDate.toISOString()
+                        };
+                        
+                        // 添加到用户挑战列表
+                        userChallenges.push(newUserChallenge);
+                        
+                        // 保存到localStorage
+                        localStorage.setItem('userChallenges', JSON.stringify(userChallenges));
+                        
+                        // 重新渲染挑战列表
+                        renderChallenges(presetChallenges, userChallenges, document.querySelector('.filter-tab.active').dataset.filter);
+                        return;
+                    }
+                    
+                    // 显示模态框
+                    joinModal.style.display = 'block';
+                    modalInput.focus();
+                }
+            };
+            
+            // 继续挑战
+            window.continueChallenge = function(challengeId) {
+                // 刷新当前页面
+                location.reload();
+            };
+            
+            // 添加书籍
+            window.addBook = function(challengeId) {
+                const input = document.getElementById(`bookInput-${challengeId}`);
+                const bookName = input.value.trim();
+                
+                if (!bookName) {
+                    alert('请输入书名！');
+                    return;
+                }
+                
+                // 找到对应的用户挑战
+                const challenge = userChallenges.find(ch => ch.id === challengeId);
+                if (challenge) {
+                    // 检查是否已达到最大书籍数量
+                    if (challenge.books.length >= challenge.bookCount) {
+                        alert(`该挑战最多只能添加 ${challenge.bookCount} 本书！`);
+                        return;
+                    }
+                    
+                    // 检查书籍是否已存在
+                    if (challenge.books.some(book => book.name === bookName)) {
+                        alert('该书已经添加过了！');
+                        return;
+                    }
+                    
+                    // 添加新书籍
+                    const newBook = {
+                        id: Date.now(),
+                        name: bookName,
+                        completed: false
+                    };
+                    
+                    challenge.books.push(newBook);
+                    
+                    // 保存到localStorage
+                    localStorage.setItem('userChallenges', JSON.stringify(userChallenges));
+                    
+                    // 清空输入框
+                    input.value = '';
+                    
+                    // 重新渲染挑战列表
+                    renderChallenges(presetChallenges, userChallenges, document.querySelector('.filter-tab.active').dataset.filter);
+                }
+            };
+            
+            // 切换书籍完成状态
+            window.toggleBookCompleted = function(challengeId, bookId) {
+                // 找到对应的用户挑战和书籍
+                const challenge = userChallenges.find(ch => ch.id === challengeId);
+                if (challenge) {
+                    const book = challenge.books.find(b => b.id === bookId);
+                    if (book) {
+                        // 切换完成状态
+                        book.completed = !book.completed;
+                        
+                        // 更新挑战状态
+                        const completedBooks = challenge.books.filter(b => b.completed).length;
+                        if (completedBooks === challenge.bookCount) {
+                            challenge.status = 'completed';
+                        } else {
+                            challenge.status = 'active';
+                        }
+                        
+                        // 保存到localStorage
+                        localStorage.setItem('userChallenges', JSON.stringify(userChallenges));
+                        
+                        // 重新渲染挑战列表
+                        renderChallenges(presetChallenges, userChallenges, document.querySelector('.filter-tab.active').dataset.filter);
+                    }
+                }
+            };
+            
+            // 添加筛选标签事件监听
+            const filterTabs = document.querySelectorAll('.filter-tab');
+            filterTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 移除所有活跃状态
+                    filterTabs.forEach(t => {
+                        t.style.background = 'rgba(244, 228, 188, 0.9)';
+                        t.style.border = '2px solid #8b4513';
+                    });
+                    // 添加当前标签活跃状态
+                    this.style.background = 'linear-gradient(135deg, #d4a76a 0%, #8b4513 100%)';
+                    this.style.border = '2px solid #8b4513';
+                    
+                    // 重新渲染过滤后的挑战列表
+                    renderChallenges(presetChallenges, userChallenges, this.dataset.filter);
+                });
+            });
+        });
+        
+        // 更新挑战状态（检查是否超时）
+        function updateChallengeStatuses(userChallenges) {
+            const now = new Date();
+            let statusChanged = false;
+            
+            userChallenges.forEach(challenge => {
+                // 只有active状态的挑战需要检查
+                if (challenge.status === 'active') {
+                    const deadline = new Date(challenge.deadline);
+                    if (now > deadline) {
+                        // 挑战超时，标记为失败
+                        challenge.status = 'failed';
+                        statusChanged = true;
+                    }
+                }
+            });
+            
+            if (statusChanged) {
+                localStorage.setItem('userChallenges', JSON.stringify(userChallenges));
+            }
+        }
+        
+        // 渲染挑战列表
+        function renderChallenges(presetChallenges, userChallenges, filter = 'all') {
+            const challengeGrid = document.getElementById('challengeGrid');
+            
+            // 计算可参加的挑战：所有系统推荐挑战（支持重复参加）
+            const availableChallenges = presetChallenges;
+            
+            // 计算各状态挑战
+            const now = new Date();
+            const activeChallenges = userChallenges.filter(ch => {
+                const deadline = new Date(ch.deadline);
+                return ch.status === 'active' && now <= deadline;
+            });
+            
+            const completedChallenges = userChallenges.filter(ch => {
+                return ch.status === 'completed' || ch.status === 'failed';
+            });
+            
+            // 合并所有挑战
+            let allChallenges = [...availableChallenges, ...activeChallenges, ...completedChallenges];
+            
+            // 根据筛选条件过滤
+            let filteredChallenges = allChallenges;
+            if (filter === 'in-progress') {
+                filteredChallenges = activeChallenges;
+            } else if (filter === 'completed') {
+                filteredChallenges = completedChallenges;
+            } else if (filter === 'available') {
+                filteredChallenges = availableChallenges;
+            }
+            
+            // 渲染挑战卡片
+            challengeGrid.innerHTML = filteredChallenges.map(challenge => {
+                // 计算已完成书籍数量
+                const completedBooks = challenge.books ? challenge.books.filter(book => book.completed).length : 0;
+                
+                // 生成书籍列表HTML
+                const booksHTML = challenge.books ? challenge.books.map(book => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 0.8rem; background: rgba(244, 228, 188, 0.7); border-radius: 6px; border: 1px solid #d4a76a;">
+                        <span ${book.completed ? 'style="text-decoration: line-through; color: #8b4513;"' : ''}>${book.name}</span>
+                        <input type="checkbox" ${book.completed ? 'checked' : ''} onchange="toggleBookCompleted(${challenge.id}, ${book.id})" style="width: 18px; height: 18px; accent-color: #d4a76a;">
+                    </div>
+                `).join('') : '';
+                
+                // 生成添加书籍区域HTML
+                const addBookHTML = challenge.status === 'active' && (!challenge.books || challenge.books.length < challenge.bookCount) ? `
+                    <div style="display: flex; gap: 0.8rem; margin-bottom: 1rem;">
+                        <input type="text" id="bookInput-${challenge.id}" placeholder="输入书名" style="flex: 1; padding: 0.8rem; background: rgba(255, 255, 255, 0.9); border: 2px solid #8b4513; border-radius: 8px; font-family: 'Georgia', serif; color: #3a2f1e;">
+                        <button onclick="addBook(${challenge.id})" style="padding: 0.8rem 1.5rem; background: linear-gradient(135deg, #d4a76a 0%, #8b4513 100%); color: #3a2f1e; border: 2px solid #8b4513; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; font-family: 'Georgia', serif;">添加书籍</button>
+                    </div>
+                ` : '';
+                
+                // 生成进度条HTML
+                const progressHTML = challenge.status === 'active' ? `
+                    <div style="margin: 1rem 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>已完成 ${completedBooks}/${challenge.bookCount}</span>
+                            <span>${Math.round((completedBooks / challenge.bookCount) * 100)}%</span>
+                        </div>
+                        <div style="width: 100%; height: 12px; background: rgba(244, 228, 188, 0.7); border-radius: 6px; overflow: hidden; border: 1px solid #d4a76a;">
+                            <div style="width: ${(completedBooks / challenge.bookCount) * 100}%; height: 100%; background: linear-gradient(90deg, #d4a76a 0%, #8b4513 100%); transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                ` : '';
+                
+                // 生成挑战标题（含自定义值）
+                let challengeTitle = challenge.title;
+                if (challenge.customValue) {
+                    challengeTitle += ` · ${challenge.customValue}`;
+                }
+                
+                // 生成状态标签
+                let statusTag = '';
+                let achievementHTML = '';
+                let cardStyle = '';
+                let buttonHTML = '';
+                
+                if (challenge.status === 'available') {
+                    buttonHTML = `<button onclick="joinChallenge(${challenge.id})" style="padding: 0.8rem 1.5rem; background: linear-gradient(135deg, #d4a76a 0%, #8b4513 100%); color: #3a2f1e; border: 2px solid #8b4513; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; font-family: 'Georgia', serif;">参加挑战</button>`;
+                } else if (challenge.status === 'active') {
+                    statusTag = `<div style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #d4a76a 0%, #8b4513 100%); color: #3a2f1e; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid #8b4513;">进行中</div>`;
+                    buttonHTML = `<button onclick="continueChallenge(${challenge.id})" style="padding: 0.8rem 1.5rem; background: linear-gradient(135deg, #d4a76a 0%, #8b4513 100%); color: #3a2f1e; border: 2px solid #8b4513; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; font-family: 'Georgia', serif;">继续挑战</button>`;
+                } else if (challenge.status === 'completed') {
+                    statusTag = `<div style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #8b4513 0%, #d4a76a 100%); color: #3a2f1e; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid #8b4513;">已完成</div>`;
+                    achievementHTML = `
+                        <div style="background: rgba(212, 167, 106, 0.2); padding: 1rem; border-radius: 8px; margin: 1rem 0; text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎉</div>
+                            <div style="font-weight: bold; margin-bottom: 0.5rem;">恭喜，已完成挑战！</div>
+                            <div style="background: linear-gradient(135deg, #d4a76a 0%, #8b4513 100%); color: #3a2f1e; padding: 0.5rem 1rem; border-radius: 20px; display: inline-block; font-size: 0.9rem;">
+                                ${challenge.type === 'author' ? '作者研究者' : challenge.type === 'theme' ? '主题探索者' : '阅读快手'}
+                            </div>
+                        </div>
+                    `;
+                    buttonHTML = `<button disabled style="padding: 0.8rem 1.5rem; background: rgba(200, 200, 200, 0.7); color: #888; border: 2px solid #ccc; border-radius: 8px; cursor: not-allowed; font-weight: bold; font-family: 'Georgia', serif;">已完成</button>`;
+                } else if (challenge.status === 'failed') {
+                    statusTag = `<div style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #772e25 0%, #c1121f 100%); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid #772e25;">未完成</div>`;
+                    achievementHTML = `
+                        <div style="background: rgba(193, 18, 31, 0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0; text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">😞</div>
+                            <div style="color: #c1121f; margin-bottom: 0.5rem;">未完成挑战</div>
+                        </div>
+                    `;
+                    cardStyle = 'opacity: 0.7;';
+                    buttonHTML = `<button disabled style="padding: 0.8rem 1.5rem; background: rgba(200, 200, 200, 0.7); color: #888; border: 2px solid #ccc; border-radius: 8px; cursor: not-allowed; font-weight: bold; font-family: 'Georgia', serif;">已结束</button>`;
+                }
+                
+                // 生成挑战卡片
+                return `
+                    <div class="card" style="position: relative; ${cardStyle}">
+                        ${statusTag}
+                        <h3>${challengeTitle}</h3>
+                        <p style="color: #8b4513; margin-bottom: 1rem;">${challenge.description}</p>
+                        <div style="margin-bottom: 1rem; color: #8b4513; font-size: 0.9rem;">
+                            ${challenge.difficulty === '简单' ? '⭐️ 简单' : challenge.difficulty === '中等' ? '⭐️⭐️ 中等难度' : '⭐️⭐️⭐️ 困难'} · 📅 ${challenge.duration} · 📚 ${challenge.bookCount}本书
+                        </div>
+                        
+                        ${progressHTML}
+                        
+                        ${addBookHTML}
+                        
+                        ${booksHTML}
+                        
+                        ${achievementHTML}
+                        
+                        <div style="display: flex; justify-content: center; margin-top: 1.5rem;">
+                            ${buttonHTML}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 移动端菜单切换
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

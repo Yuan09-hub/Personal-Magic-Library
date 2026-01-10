@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人书房 - 数据可视化</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // 移动端菜单切换
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('active');
+        }
+    </script>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">个人魔法书房</a>
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">我的藏书</a></li>
+                <li><a href="atlas.html">书籍地图</a></li>
+                <li><a href="notes.html">主题札记</a></li>
+                <li><a href="reading_challenge.html">阅读挑战</a></li>
+                <li><a href="moments.html">瞬间记录</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="container">
+        <h1>数据可视化</h1>
+        <p>把阅读的书籍按作者的国别展现在全球地图中，给您一种成就感。</p>
+
+        <!-- 全球地图可视化 -->
+        <section>
+            <h2>全球阅读地图</h2>
+            <p>展示您阅读的书籍按作者国别的分布情况</p>
+            <div class="global-map">
+                <!-- 地图背景 -->
+                <div style="width: 100%; height: 100%; background-color: #e3f2fd; border-radius: 8px;">
+                    <!-- 地图标记点 -->
+                    <div class="map-marker" style="left: 30%; top: 20%;" data-count="12"></div>
+                    <div class="map-marker" style="left: 35%; top: 25%;" data-count="8"></div>
+                    <div class="map-marker" style="left: 40%; top: 30%;" data-count="5"></div>
+                    <div class="map-marker" style="left: 45%; top: 35%;" data-count="15"></div>
+                    <div class="map-marker" style="left: 50%; top: 25%;" data-count="22"></div>
+                    <div class="map-marker" style="left: 55%; top: 30%;" data-count="7"></div>
+                    <div class="map-marker" style="left: 60%; top: 20%;" data-count="10"></div>
+                    <div class="map-marker" style="left: 65%; top: 25%;" data-count="6"></div>
+                    <div class="map-marker" style="left: 70%; top: 35%;" data-count="4"></div>
+                    <div class="map-marker" style="left: 25%; top: 45%;" data-count="18"></div>
+                    <div class="map-marker" style="left: 30%; top: 55%;" data-count="9"></div>
+                    <div class="map-marker" style="left: 35%; top: 65%;" data-count="3"></div>
+                    <div class="map-marker" style="left: 75%; top: 55%;" data-count="11"></div>
+                    <div class="map-marker" style="left: 80%; top: 65%;" data-count="2"></div>
+                    <div class="map-marker" style="left: 15%; top: 40%;" data-count="14"></div>
+                    <div class="map-marker" style="left: 20%; top: 50%;" data-count="16"></div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 1rem; color: #666;">
+                <p>点击地图上的标记点查看详细信息</p>
+            </div>
+        </section>
+
+        <!-- 阅读统计面板 -->
+        <section class="stats-panel">
+            <h2>阅读统计</h2>
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <div class="stat-value">42</div>
+                    <div class="stat-label">已读书籍</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">涉及国家</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">35</div>
+                    <div class="stat-label">不同作者</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">阅读语种</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 作者国别分布 -->
+        <section class="card">
+            <h2>作者国别分布</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>中国</h3>
+                    <div class="stat-value">18</div>
+                    <p style="color: #666;">余华、莫言、曹雪芹等</p>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>美国</h3>
+                    <div class="stat-value">12</div>
+                    <p style="color: #666;">海明威、福克纳、塞林格等</p>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>英国</h3>
+                    <div class="stat-value">8</div>
+                    <p style="color: #666;">莎士比亚、狄更斯、奥斯汀等</p>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>哥伦比亚</h3>
+                    <div class="stat-value">5</div>
+                    <p style="color: #666;">加西亚·马尔克斯等</p>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>法国</h3>
+                    <div class="stat-value">7</div>
+                    <p style="color: #666;">雨果、巴尔扎克、加缪等</p>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>俄国</h3>
+                    <div class="stat-value">6</div>
+                    <p style="color: #666;">托尔斯泰、陀思妥耶夫斯基等</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 阅读成就 -->
+        <section class="achievements">
+            <h2>阅读成就</h2>
+            <div class="achievement-item">
+                <div class="achievement-icon">🌍</div>
+                <div class="achievement-content">
+                    <div class="achievement-title">环球阅读者</div>
+                    <div class="achievement-description">阅读了来自18个国家的书籍</div>
+                </div>
+            </div>
+            <div class="achievement-item">
+                <div class="achievement-icon">📚</div>
+                <div class="achievement-content">
+                    <div class="achievement-title">书虫进阶</div>
+                    <div class="achievement-description">已读书籍超过40本</div>
+                </div>
+            </div>
+            <div class="achievement-item">
+                <div class="achievement-icon">🏆</div>
+                <div class="achievement-content">
+                    <div class="achievement-title">多语言大师</div>
+                    <div class="achievement-description">阅读了12种不同语种的书籍</div>
+                </div>
+            </div>
+            <div class="achievement-item">
+                <div class="achievement-icon">🌟</div>
+                <div class="achievement-content">
+                    <div class="achievement-title">文学探索者</div>
+                    <div class="achievement-description">阅读了5种不同文学流派的作品</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 年度阅读趋势 -->
+        <section class="reading-trend">
+            <h2>年度阅读趋势</h2>
+            <div class="chart-container">
+                <p>📈 年度阅读量变化趋势</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>2021</h3>
+                    <div class="stat-value">15</div>
+                    <p style="color: #666;">书籍数量</p>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>2022</h3>
+                    <div class="stat-value">22</div>
+                    <p style="color: #666;">书籍数量</p>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>2023</h3>
+                    <div class="stat-value">30</div>
+                    <p style="color: #666;">书籍数量</p>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>2024</h3>
+                    <div class="stat-value">38</div>
+                    <p style="color: #666;">书籍数量</p>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>2025</h3>
+                    <div class="stat-value">42</div>
+                    <p style="color: #666;">书籍数量（截至当前）</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 阅读时长统计 -->
+        <section class="card">
+            <h2>阅读时长统计</h2>
+            <div class="chart-container">
+                <p>⏱️ 月度阅读时长统计</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div style="text-align: center;">
+                    <h4>1月</h4>
+                    <div class="stat-value">120</div>
+                    <p style="color: #666;">小时</p>
+                </div>
+                <div style="text-align: center;">
+                    <h4>2月</h4>
+                    <div class="stat-value">95</div>
+                    <p style="color: #666;">小时</p>
+                </div>
+                <div style="text-align: center;">
+                    <h4>3月</h4>
+                    <div class="stat-value">110</div>
+                    <p style="color: #666;">小时</p>
+                </div>
+                <div style="text-align: center;">
+                    <h4>4月</h4>
+                    <div class="stat-value">105</div>
+                    <p style="color: #666;">小时</p>
+                </div>
+                <div style="text-align: center;">
+                    <h4>5月</h4>
+                    <div class="stat-value">130</div>
+                    <p style="color: #666;">小时</p>
+                </div>
+                <div style="text-align: center;">
+                    <h4>6月</h4>
+                    <div class="stat-value">125</div>
+                    <p style="color: #666;">小时</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 阅读体裁分布 -->
+        <section class="card">
+            <h2>阅读体裁分布</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>小说</h3>
+                    <div class="stat-value">55%</div>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>非虚构</h3>
+                    <div class="stat-value">20%</div>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>科学</h3>
+                    <div class="stat-value">10%</div>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>历史</h3>
+                    <div class="stat-value">8%</div>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 1rem; border-radius: 8px;">
+                    <h3>哲学</h3>
+                    <div class="stat-value">7%</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <p>&copy; 2025 个人书房. 保留所有权利.</p>
+    </footer>
+
+    <!-- 滚动到顶部按钮 -->
+    <button class="scroll-top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">&uarr;</button>
+</body>
+</html>

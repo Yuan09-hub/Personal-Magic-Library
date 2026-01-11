@@ -28,6 +28,7 @@
 
         /* 发布瞬间区域 */
         .post-moment-section {
+            background: white;
             background-image: url('images/Notes-taking.png');
             background-size: cover;
             background-position: center;
@@ -47,7 +48,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* 深色半透明遮罩 */
+            background: rgba(0, 0, 0, 0.6); /* 深色半透明遮罩 */
             z-index: 1;
         }
         
@@ -56,19 +57,6 @@
             position: relative;
             z-index: 2;
         }
-        
-        /* 调整输入框和按钮样式以适应遮罩背景 */
-        .post-moment-section .moment-input {
-            background: rgba(255, 255, 255, 0.9);
-        }
-        
-        .post-moment-section .attachment-btn {
-            background: rgba(240, 237, 231, 0.9);
-        }
-        
-        .post-moment-section .post-btn {
-            background: rgba(212, 184, 150, 0.9);
-        }
 
         .moment-input {
             width: 100%;
@@ -76,12 +64,13 @@
             padding: 1rem;
             border: 2px solid #d4b896;
             border-radius: 8px;
-            background: #f8f6f2;
+            background: rgba(248, 246, 242, 0.95);
             color: #3a2f1e;
             font-size: 1.1rem;
             font-family: 'Georgia', serif;
             resize: vertical;
             margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .moment-input::placeholder {
@@ -96,7 +85,7 @@
         }
 
         .attachment-btn {
-            background: #f0ede7;
+            background: rgba(240, 237, 231, 0.95);
             color: #5a4430;
             border: none;
             padding: 0.8rem 1.5rem;
@@ -107,6 +96,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .attachment-btn:hover {
@@ -115,7 +105,7 @@
         }
 
         .post-btn {
-            background: #d4b896;
+            background: rgba(212, 184, 150, 0.95);
             color: #5a4430;
             border: none;
             padding: 1rem 2rem;
@@ -126,6 +116,7 @@
             letter-spacing: 0.05em;
             transition: all 0.3s ease;
             width: 100%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .post-btn:hover {

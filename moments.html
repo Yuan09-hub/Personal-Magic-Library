@@ -237,7 +237,7 @@
                 <label class="attachment-btn" for="imageUpload">
                     📷 图片
                 </label>
-                <input type="file" id="imageUpload" class="file-input" accept="image/*">
+                <input type="file" id="imageUpload" class="file-input" accept="image/*" capture="">
             </div>
             
             <!-- 图片预览 -->
@@ -338,6 +338,9 @@
                 reader.onload = function(e) {
                     imageData = e.target.result;
                     processMoment(content, imageData);
+                };
+                reader.onerror = function() {
+                    alert('图片处理失败，请重试');
                 };
                 reader.readAsDataURL(imageInput.files[0]);
                 return;

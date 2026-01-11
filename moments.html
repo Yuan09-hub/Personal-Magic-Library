@@ -199,6 +199,39 @@
             margin-bottom: 1rem;
             display: block;
         }
+        
+        /* Toast提示样式 */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            animation: fadeInOut 2s ease-in-out;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            text-align: center;
+        }
+        
+        .toast.success {
+            background-color: #4caf50;
+        }
+        
+        .toast.error {
+            background-color: #f44336;
+        }
+        
+        /* Toast动画 */
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        }
     </style>
 </head>
 <body>
@@ -229,7 +262,9 @@
         <section class="post-moment-section">
             <textarea 
                 class="moment-input" 
-                placeholder="今天读到一句震撼的话……" 
+                placeholder="今天读到一句震撼的话……
+刚读完这一段，心里很安静
+这个比喻太妙了" 
                 id="momentText"
             ></textarea>
             
@@ -237,11 +272,13 @@
                 <label class="attachment-btn" for="imageUpload">
                     📷 图片
                 </label>
-                <input type="file" id="imageUpload" class="file-input" accept="image/*" capture="">
+                <input type="file" id="imageUpload" class="file-input" accept="image/*">
             </div>
             
             <!-- 图片预览 -->
             <div id="imagePreview" class="image-preview-container"></div>
+            <!-- 图片上传提示 -->
+            <div id="uploadStatus" class="upload-status"></div>
             
             <button class="post-btn" onclick="postMoment()">发布</button>
         </section>
@@ -339,9 +376,6 @@
                     imageData = e.target.result;
                     processMoment(content, imageData);
                 };
-                reader.onerror = function() {
-                    alert('图片处理失败，请重试');
-                };
                 reader.readAsDataURL(imageInput.files[0]);
                 return;
             }
@@ -383,6 +417,25 @@
         }
         
         // 图片预览 - 确保图片上传后立即显示
+        // 显示toast提示
+        function showToast(message, isSuccess = true) {
+            // 创建toast元素
+            const toast = document.createElement('div');
+            toast.className = `toast ${isSuccess ? 'success' : 'error'}`;
+            toast.textContent = message;
+            
+            // 添加到页面
+            document.body.appendChild(toast);
+            
+            // 2秒后自动移除
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 2000);
+        }
+        
+        // 图片上传事件监听
         document.getElementById('imageUpload').addEventListener('change', function(e) {
             const preview = document.getElementById('imagePreview');
             preview.innerHTML = '';
@@ -390,18 +443,19 @@
             if (e.target.files.length > 0) {
                 const file = e.target.files[0];
                 const reader = new FileReader();
+                
                 reader.onload = function(e) {
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     img.className = 'image-preview';
                     preview.appendChild(img);
+                    // 显示上传成功提示
+                    showToast('图片上传成功 ✓', true);
                 };
+                
+                reader.onerror = function() {
+                    // 显示上传失败提示
+                    showToast('图片上传失败，请重试', false);
+                };
+                
                 reader.readAsDataURL(file);
-            }
-        });
-        
-        // 页面加载时渲染瞬间列表
-        document.addEventListener('DOMContentLoaded', renderMoments);
-    </script>
-</body>
-</html>
